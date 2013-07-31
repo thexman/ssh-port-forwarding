@@ -1,0 +1,33 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+  	<j:set var="helpURL" value="/plugin/ssh-port-forwarding" />
+        
+  	<f:entry title="${%SSH host}" help="${helpURL}/help-hostname.html">
+		<f:textbox name="ssh.host" value="${instance.host}"/>
+  	</f:entry>
+  	
+   	<f:entry title="${%SSH Port}" help="${helpURL}/help-port.html">
+       	<f:textbox name="ssh.port" value="${instance.port}"/>
+    </f:entry>
+    
+    <f:entry title="${%SSH Username}" help="${helpURL}/help-login.html">
+       	<f:textbox name="ssh.username" value="${instance.username}"/>
+    </f:entry>
+    
+    <f:entry title="${%SSH Password}" help="${helpURL}/help-port.html">
+    	<input class="setting-input" name="ssh.password" type="password" value="${instance.password}" />
+	</f:entry>
+	
+	<f:entry title="${%Keyfile}" help="${helpURL}/help-keyfile.html">
+       	<f:textbox name="ssh.keyfile" value="${instance.keyfile}"/>
+    </f:entry>                 
+    
+    <f:entry title="${%serverAliveInterval}" help="${helpURL}/help-serverAliveInterval.html">
+    	<f:textbox name="ssh.serverAliveInterval" value="${instance.serverAliveInterval}"/>
+   	</f:entry>
+    
+    <f:entry title="${%Port forwarding}" help="${helpURL}/help-portforwarding.html">
+		<f:textarea name="ssh.portForwardingsStr" value="${instance.portForwardingsStr}"/>
+  	</f:entry>    
+  	
+</j:jelly>
