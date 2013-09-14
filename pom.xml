@@ -13,7 +13,15 @@ Based on the SSH plugin (http://wiki.jenkins-ci.org/display/JENKINS/SSH+plugin).
 	<name>Jenkins SSH Port Forwarding plugin</name>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>hpi</packaging>
-	<!--url>http://wiki.jenkins-ci.org/display/JENKINS/SSH+plugin</url-->
+	<url>http://wiki.jenkins-ci.org/display/JENKINS/ssh-port-forwarding</url>
+
+	<developers>
+		<developer>
+			<id>kiril_arabadzhiyski</id>
+			<name>Kiril Arabadzhiyski</name>
+			<email></email>
+		</developer>
+	</developers>
 
 	<dependencies>
 		<dependency>
@@ -25,6 +33,15 @@ Based on the SSH plugin (http://wiki.jenkins-ci.org/display/JENKINS/SSH+plugin).
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>1.8.1</version>
+				<configuration>
+					<connectionType>connection</connectionType>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
 				<configuration>
@@ -57,9 +74,17 @@ Based on the SSH plugin (http://wiki.jenkins-ci.org/display/JENKINS/SSH+plugin).
 		</pluginRepository>
 	</pluginRepositories>
 
-	<!--scm>
-		<connection>scm:git:git@github.com:jenkinsci/ssh-plugin.git</connection>
-		<developerConnection>scm:git:git@github.com:jenkinsci/ssh-plugin.git</developerConnection>
-	</scm-->
+
+	<scm>
+		<connection>scm:git:ssh://github.com/jenkinsci/ssh-port-forwarding.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ssh-port-forwarding.git</developerConnection>
+		<url>https://github.com/jenkinsci/ssh-port-forwarding</url>
+	</scm>
+	
+	<!-- scm> 
+		<connection>scm:git:https://github.com/thexman/ssh-port-forwarding.git</connection> 
+		<developerConnection>scm:git:https://github.com/thexman/ssh-port-forwarding.git</developerConnection> 
+		<url>https://github.com/thexman/ssh-port-forwarding</url> 
+	</scm -->
 
 </project>
