@@ -1,21 +1,10 @@
 package org.jvnet.hudson.plugins;
 
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.BuildWrapper;
-import hudson.tasks.BuildWrapperDescriptor;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-
-import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -25,6 +14,17 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
+
+import hudson.EnvVars;
+import hudson.Extension;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.BuildWrapper;
+import hudson.tasks.BuildWrapperDescriptor;
+import net.sf.json.JSONObject;
 
 public final class PortForwardingBuildWrapper extends BuildWrapper {
 
@@ -64,7 +64,8 @@ public final class PortForwardingBuildWrapper extends BuildWrapper {
 	public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
 		final PrintStream logger = listener.getLogger();
 		JSch.setLogger( createSshLogger(logger) );
-		final Session session = forwardPorts(logger);
+		final EnvVars envVars = build.getEnvironment(listener); 
+		final Session session = forwardPorts(logger, envVars);		
 		 
 		Environment env = null;
 		if (session != null) { 
@@ -200,17 +201,23 @@ public final class PortForwardingBuildWrapper extends BuildWrapper {
 		logger.println(StringUtils.defaultString(DESCRIPTOR.getShortName()) + message);
 	}
 	
-	private Session createSession() throws JSchException {
-		JSch jsch = new JSch();		
-		Session session = jsch.getSession(username, host, port);
+	private Session createSession(final EnvVars envVars) throws JSchException {
+		final JSch jsch = new JSch();		
+		final Session session = jsch.getSession(username, host, port);
 		session.setDaemonThread(true);
 		if (this.keyfile != null && this.keyfile.length() > 0) {
-			jsch.addIdentity(this.keyfile, this.password);
+			final String keyFile;
+			if (envVars != null) {
+				keyFile = envVars.expand(this.keyfile);
+			} else {
+				keyFile = this.keyfile;
+			}
+			jsch.addIdentity(keyFile, this.password);
 		} else {
 			session.setPassword(password);
 		}
 
-		UserInfo ui = new SSHUserInfo(password);
+		final UserInfo ui = new SSHUserInfo(password);
 		session.setUserInfo(ui);
 
 		session.setServerAliveInterval(serverAliveInterval);
@@ -223,11 +230,11 @@ public final class PortForwardingBuildWrapper extends BuildWrapper {
 		return session;
 	}
 
-	public Session forwardPorts(final PrintStream logger) throws InterruptedException {		
+	public Session forwardPorts(final PrintStream logger, final EnvVars envVars) throws InterruptedException {		
 		try {
 			log(logger, String.format("Creating session to %s@%s:%d", username, host, port));						
 			
-			final Session session = createSession();			
+			final Session session = createSession(envVars);
 			for(final ForwardingDescriptor d : portForwardings) {												
 				log(logger, d.toDisplayString());															
 				session.setPortForwardingL(d.getLocalPort(), d.getRemoteHost(), d.getRemotePort());
